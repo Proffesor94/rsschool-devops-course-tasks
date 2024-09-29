@@ -30,6 +30,10 @@ jobs:
       id-token: write
       contents: read
     steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       # Step 4: Configure AWS credentials with role assumption
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
