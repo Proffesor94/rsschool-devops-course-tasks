@@ -98,8 +98,6 @@ Please take a look at .github/workflows/deploy.yml
 
 ### **9. Troubleshooting**
 - **OIDC Authentication Issues**: Ensure that the IAM role has the correct trust policy and that the GitHub OIDC provider is registered in AWS.
-- **State Locking Issues**: Check your DynamoDB table and S3 bucket for any conflicting locks if you encounter state locking issues.
-
 ---
 
 This setup automates your infrastructure deployments, ensuring consistency and best practices by incorporating checks for Terraform formatting, planning, and applying changes directly from your GitHub repository.
