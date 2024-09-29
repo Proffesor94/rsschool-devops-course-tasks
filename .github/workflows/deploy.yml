@@ -11,6 +11,9 @@ on:
 jobs:
   terraform-plan:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       # Step 1: Checkout the code from the repository
       - name: Checkout Code
@@ -22,6 +25,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}  # The IAM role ARN secret
           aws-region: ${{ secrets.AWS_REGION }}        # The AWS region secret
+          audience: sts.amazonaws.com                  # OIDC audience for GitHub Actions to assume the role
 
       # Step 3: Set up Terraform
       - name: Set up Terraform
