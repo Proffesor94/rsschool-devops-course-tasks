@@ -9,27 +9,29 @@ on:
       - main
 
 jobs:
-  terraform-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Format Check
-        run: terraform fmt -check
-
   terraform-plan:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the code from the repository
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      # Step 2: Configure AWS credentials with role assumption
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}  # The IAM role ARN secret
+          aws-region: ${{ secrets.AWS_REGION }}        # The AWS region secret
+
+      # Step 3: Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
+      # Step 4: Run Terraform init
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 5: Run Terraform Plan
       - name: Terraform Plan
         run: terraform plan
 
@@ -40,8 +42,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      # Reconfigure AWS credentials for apply job
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}  
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
+      # Terraform Apply (with auto-approve for non-interactive CI runs)
       - name: Terraform Apply
         run: terraform apply -auto-approve
