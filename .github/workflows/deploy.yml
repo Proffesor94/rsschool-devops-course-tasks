@@ -9,24 +9,27 @@ on:
       - main
 
 jobs:
+  terraform-check:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      # Step 3: Run Terraform check
+      - name: Check Terraform format
+        run: terraform fmt -check  # This command checks if the Terraform code is formatted correctly
+  
   terraform-plan:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
-      # Step 1: Checkout the code from the repository
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      # Step 2: Set up Terraform
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-      
-      # Step 3: Run Terraform check
-      - name: Check Terraform format
-        run: terraform fmt -check
-
       # Step 4: Configure AWS credentials with role assumption
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
