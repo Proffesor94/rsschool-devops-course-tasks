@@ -66,6 +66,9 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           audience: sts.amazonaws.com
 
+      - name: Terraform Init
+        run: terraform init
+
       - name: Terraform Plan
         run: terraform plan
         continue-on-error: false  # Fail early on error
@@ -92,6 +95,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
           audience: sts.amazonaws.com
+
+      - name: Terraform Init
+        run: terraform init
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
