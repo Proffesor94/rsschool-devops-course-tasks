@@ -10,6 +10,10 @@ on:
       - main
       - task_2
 
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
   terraform-check:
     env:
@@ -23,7 +27,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Check Terraform format
-        run: terraform fmt -check -recursive
+        run: terraform fmt -check
       
       - name: Validate Terraform files
         run: terraform validate
