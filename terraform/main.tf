@@ -8,8 +8,7 @@ terraform {
 
   backend "s3" {
     bucket  = "terraform-states-bucket01"
-    key     = "state/terraform.tfstate"
+    key    = "terraform.tfstate"
     region  = "eu-north-1"
-    encrypt = true
   }
 }
