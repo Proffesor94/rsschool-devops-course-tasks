@@ -12,9 +12,9 @@ resource "aws_instance" "ec2_in_public_subnet" {
   }
 }
 
-data "aws_subnet" "public_subnet" { 
+data "aws_subnet" "public_subnet" {
   count = length(var.cidr_public_subnet)
-  
+
   filter {
     name   = "tag:Name"
     values = ["Public Subnet #${count.index + 1}"]
@@ -26,12 +26,12 @@ data "aws_subnet" "public_subnet" {
 }
 
 resource "aws_instance" "bastion" {
-  ami           = var.aws_linux_ami
-  instance_type = "t3.micro"
-  subnet_id     = aws_subnet.public_subnets[0].id
-  key_name      = var.ssh_key_name
+  ami                         = var.aws_linux_ami
+  instance_type               = "t3.micro"
+  subnet_id                   = aws_subnet.public_subnets[0].id
+  key_name                    = var.ssh_key_name
   associate_public_ip_address = true
-  
+
   tags = {
     Name    = "Bastion Host"
     Owner   = "Pavel Shumilin"
@@ -56,14 +56,14 @@ resource "aws_instance" "private_instance" {
 }
 
 resource "aws_instance" "nat_instance" {
-  ami                    = var.aws_nat_ami
-  instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public_subnets[0].id
-  key_name               = var.ssh_key_name
+  ami                         = var.aws_nat_ami
+  instance_type               = "t3.micro"
+  subnet_id                   = aws_subnet.public_subnets[0].id
+  key_name                    = var.ssh_key_name
   associate_public_ip_address = true
 
   source_dest_check = false
-  
+
   tags = {
     Name    = "NAT Instance"
     Project = "Task 2"

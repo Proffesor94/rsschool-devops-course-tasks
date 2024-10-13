@@ -4,7 +4,7 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.68"
     }
-  } 
+  }
 
   backend "s3" {
     bucket  = "terraform-states-bucket01"

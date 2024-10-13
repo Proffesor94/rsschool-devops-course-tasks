@@ -61,7 +61,7 @@ variable "eu_availability_zone" {
 variable "ssh_key_name" {
   description = "SSH key to access EC2 instances"
   type        = string
-  default     = "aws-key"  # Replace with your actual AWS key name
+  default     = "aws-key" # Replace with your actual AWS key name
 }
 
 variable "aws_nat_ami" {

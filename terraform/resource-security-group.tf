@@ -71,10 +71,10 @@ resource "aws_security_group" "private_instance_sg" {
   vpc_id      = aws_vpc.task_2_vpc.id
 
   ingress {
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.bastion_sg.id]
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
   }
 
   egress {
