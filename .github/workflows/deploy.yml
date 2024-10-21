@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - task_2
+      - task-3
   pull_request:
     branches:
       - main
       - task_2
+      - task-3
 
 permissions:
   id-token: write   # Required for requesting the JWT
