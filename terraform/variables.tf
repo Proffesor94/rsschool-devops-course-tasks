@@ -74,4 +74,5 @@ variable "k3s_token" {
   description = "K3S token"
   type        = string
   sensitive   = true
+  default     = "12345" # Replace with your actual K3S token
 }
