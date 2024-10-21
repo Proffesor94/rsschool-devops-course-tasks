@@ -1,98 +1,168 @@
-# VPC Infrastructure with Terraform
+# rsschool-devops-course-tasks
 
-This project uses Terraform to set up a VPC infrastructure in AWS, including public and private subnets, internet gateway, routing, security groups, and a bastion host.
+## Table of Contents
 
-## Infrastructure Overview
-
-- VPC with 2 public and 2 private subnets across different Availability Zones
-- Internet Gateway for public internet access
-- NAT Instance for private subnet internet access
-- Routing tables for public and private subnets
-- Security Groups and Network ACLs
-- Bastion host for secure access to private instances
-- EC2 instances in both public and private subnets
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
 
 ## Prerequisites
 
-- AWS account
-- Terraform installed
-- AWS CLI configured with appropriate credentials
+Before you begin, ensure you have met the following requirements:
+- **AWS Account**
+  - You should have an account with the AWS cloud provider that you plan to use for deploying the infrastructure. a new user with the following policies attached:
+    - AmazonEC2FullAccess
+    - AmazonRoute53FullAccess
+    - AmazonS3FullAccess
+    - IAMFullAccess
+    - AmazonVPCFullAccess
+    - AmazonSQSFullAccess
+    - AmazonEventBridgeFullAccess
+    - Access Key ID and Secret Access Key for the user.
+  - The user should have Access Key ID and Secret Access Key
+  - S3 bucket for Terraform states 
+    - Set necessary bucket permissions
+    - Enable bucket versioning
+    - Enable encryption
+    - Useful link:
+      - [Managing Terraform states Best Practices](https://spacelift.io/blog/terraform-s3-backend)
+  - GitHub OIDC identity provider
+    - [Github tutorial](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+    - [AWS documentation on OIDC providers](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub)
+- **AWS CLI 2** (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- **Terraform 1.9+** (https://developer.hashicorp.com/terraform/install?product_intent=terraform)
 
-## Project Structure
-terraform/
-├── main.tf
-├── variables.tf
-├── providers.tf
-├── resource-vpc-setup.tf
-├── resource-subnet.tf
-├── resource-internet-gateway.tf
-├── resource-route-table.tf
-├── resource-route-table-association.tf
-├── resource-security-group.tf
-├── resource-ec2-setup.tf
-├── outputs.tf
-└── README.md
+## Installation
 
+To set up the Terreform project, follow these steps:
 
-## Configuration Details
+1. **Create a keypair**: Generate the keypair with the command below:
+   ```bash
+   ssh-keygen -t rsa -b 4096 -f ~/.ssh/your-key
+   ```
 
-### VPC and Subnets
+2. **Clone the Repository**: Clone the project repository to your local machine using the following command:
 
-- VPC CIDR: 10.0.0.0/16
-- Public Subnets: 10.0.1.0/24, 10.0.2.0/24
-- Private Subnets: 10.0.3.0/24, 10.0.4.0/24
+   ```bash
+   git clone https://github.com/Proffesor94/rsschool-devops-course-tasks.git
+   ```
 
-### Routing
+3. **Navigate to the Project Directory**: Change your working directory to the project folder:
 
-- Public subnets route internet-bound traffic through the Internet Gateway
-- Private subnets route internet-bound traffic through the NAT Instance
+   ```bash
+   cd rsschool-devops-course-tasks
+   ```
 
-### Security
+3. **Initialize Terraform**: Initialize the Terraform working directory. This step downloads the necessary provider plugins:
 
-- Security Groups control inbound and outbound traffic at the instance level
-- Network ACLs provide an additional layer of security at the subnet level
+   ```bash
+   # backend.conf file
+   bucket  = "<PUT-S3-BUCKET-NAME-FOR-TERRAFORM-STATES>"
+   region  = "<PUT-AWS-REGION>"
+   key     = "state/terraform.tfstate"
+   encrypt = true
+   ```
 
-### NAT Configuration
-
-A NAT Instance is used instead of a NAT Gateway for cost optimization. It's placed in the first public subnet and allows instances in private subnets to access the internet.
-
-### Bastion Host
-
-A bastion host is set up in the first public subnet to provide secure SSH access to instances in private subnets.
-
+   ```bash
+   terraform init -backend-config=./path/to/backend.conf
+   ```
+   
 ## Usage
 
-1. Clone the repository
-2. Navigate to the project directory
-3. Initialize Terraform:
-'''
-terraform init
-'''
-4. Review the planned changes:
-'''
-terraform plan
-'''
-5. Apply the configuration:
-'''
-terraform apply
-'''
+To use the Terreform project, follow these steps:
 
-## Verification
+1. **Plan the Infrastructure**: Generate and review an execution plan for the infrastructure:
 
-After applying the Terraform configuration:
+   ```bash
+   terraform plan
+   ```
 
-1. Check the AWS Console to verify resource creation
-2. Navigate to VPC -> Your VPCs -> your_VPC_name -> Resource map to view the VPC structure
-3. Test connectivity between instances and to the internet as expected
+   This command will show you what actions Terraform will take to change your infrastructure.
 
-## GitHub Actions
+2. **Apply the Infrastructure**: Apply the changes required to reach the desired state of the configuration:
 
-A GitHub Actions workflow is set up to automate the Terraform deployment process. It runs on push to the main branch and includes the following steps:
+   ```bash
+   terraform apply
+   ```
+	Enter token for K3S when prompted. Confirm the action when prompted. 
+	Terraform will provision the resources as defined in the configuration files.
 
-1. Checkout code
-2. Set up Terraform
-3. Initialize Terraform
-4. Format check
-5. Validate Terraform files
-6. Plan Terraform changes
-7. Apply Terraform changes (on manual approval)
+3. **Destroy the Infrastructure**: If you need to remove the infrastructure, use the following command:
+
+   ```bash
+   terraform destroy
+   ```
+
+   Confirm the action when prompted. This will delete all the resources managed by Terraform.
+
+
+# Bastion host usage
+
+
+1. **Make the key accessible from remote via tunnels to have access from bastion to private instances**:
+
+   ```bash
+   ssh-add  ~/.ssh/path_to_your_key
+   ```
+2. **Verify connection to the bastion**:
+
+   ```bash
+   ssh -A -i ~/.ssh/path_to_your_key ubuntu@<PUT_PUBLIC_IP_OR_HOST_OF BASTION_INSTANCE>
+   ```
+
+3. **Connect from the bastion host to a private EC2 instance**:
+   ```bash
+   ssh -A ubuntu@<PUT_PRIVATE_IP>
+   ```
+
+
+# K8S cluster with [k3s](https://k3s.io/)
+
+## 1. Verify the Master Node (Control plan)
+
+1. **Connect from the bastion host to the Control plan EC2 instance**:
+   ```bash
+   ssh -A ubuntu@<PUT_PRIVATE_IP>
+   ```
+2. **Check status of k3s on master node**
+    ```bash
+    systemctl status k3s
+    ```
+   
+## 2. Check the nodes list from master node
+1. **Connect from the bastion host to the Control plan EC2 instance**:
+   ```bash
+   ssh -A ubuntu@<PUT_PRIVATE_IP>
+   ```
+   
+2. Execute command to get the nodes list
+    ```bash
+    sudo kubectl get nodes
+    ```
+    Please see the expected output:
+    ```bash
+    ubuntu@ip-10-0-2-58:~$ sudo kubectl get nodes
+	NAME           STATUS   ROLES                  AGE    VERSION
+	ip-10-0-2-38   Ready    <none>                 108s   v1.30.5+k3s1
+	ip-10-0-2-58   Ready    control-plane,master   115s   v1.30.5+k3s1
+    ```
+   
+
+## 3. Deploy a Simple Workload
+1. Deploy a Simple Workload
+
+   ```bash
+   kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
+   ```
+
+2. Verify that the pod is running:
+
+   ```bash
+   kubectl get pods
+   ```
+
+4. Verify the deployment:
+
+   ```bash
+   kubectl get deployments
+   ```

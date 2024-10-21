@@ -5,9 +5,9 @@ variable "aws_region" {
 }
 
 variable "aws_linux_ami" {
-  description = "AWS main server AMI"
+  description = "Ubuntu Server 24.04 LTS (HVM)"
   type        = string
-  default     = "ami-097c5c21a18dc59ea"
+  default     = "ami-089146c5626baa6bf"
 }
 
 variable "aws_linux_instance_type" {
@@ -43,13 +43,13 @@ variable "vpc_cidr_block" {
 variable "cidr_public_subnet" {
   description = "Public Subnet CIDR values"
   type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+  default     = ["10.0.1.0/24"]
 }
 
 variable "cidr_private_subnet" {
   description = "Private Subnet CIDR values"
   type        = list(string)
-  default     = ["10.0.3.0/24", "10.0.4.0/24"]
+  default     = ["10.0.2.0/24"]
 }
 
 variable "eu_availability_zone" {
@@ -65,7 +65,13 @@ variable "ssh_key_name" {
 }
 
 variable "aws_nat_ami" {
-  description = "AMI for NAT instance"
+  description = "Amazon Linux 2 AMI (HVM)"
   type        = string
-  default     = "ami-097c5c21a18dc59ea"
+  default     = "ami-070fe338fb2265e00"
+}
+
+variable "k3s_token" {
+  description = "K3S token"
+  type        = string
+  sensitive   = true
 }
