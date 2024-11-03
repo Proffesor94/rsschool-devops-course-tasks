@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "aws_linux_ami" {
   description = "Ubuntu Server 24.04 LTS (HVM)"
   type        = string
-  default     = "ami-089146c5626baa6bf"
+  default     = "ami-08eb150f611ca277f"
 }
 
 variable "aws_linux_instance_type" {

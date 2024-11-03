@@ -1,0 +1,32 @@
+namespace: jenkins
+
+jenkins:
+  image: "jenkins/jenkins:lts"
+  serviceAccountName: jenkins-admin
+  replicas: 1
+  storage:
+    accessMode: ReadWriteOnce
+    size: 8Gi
+    pv:
+      name: jenkins-pv
+      storageClassName: local-storage
+      hostPath: "/mnt/data/jenkins"
+    pvc:
+      name: jenkins-pv-claim
+
+  resources:
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+    requests:
+      memory: "500Mi"
+      cpu: "500m"
+
+  service:
+    nodePort: 32000
+
+storageClass:
+  enabled: true
+  name: local-storage
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
