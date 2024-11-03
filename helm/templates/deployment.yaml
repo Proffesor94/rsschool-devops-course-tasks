@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.jenkins.replicas }}
+  selector:
+    matchLabels:
+      app: jenkins-server
+  template:
+    metadata:
+      labels:
+        app: jenkins-server
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      serviceAccountName: {{ .Values.jenkins.serviceAccountName }}
+
+      # Add Init Container 
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          securityContext:
+            runAsUser: 0  # Run Init Container as root
+          command: ["sh", "-c", "chown -R 1000:1000 /var/jenkins_home"]
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+
+      containers:
+        - name: jenkins
+          image: {{ .Values.jenkins.image }}
+          resources:
+            limits:
+              memory: {{ .Values.jenkins.resources.limits.memory }}
+              cpu: {{ .Values.jenkins.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.jenkins.resources.requests.memory }}
+              cpu: {{ .Values.jenkins.resources.requests.cpu }}
+          ports:
+            - name: httpport
+              containerPort: 8080
+            - name: jnlpport
+              containerPort: 50000
+          livenessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+
+      volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.jenkins.storage.pvc.name }}
