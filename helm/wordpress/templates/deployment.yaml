@@ -60,6 +60,15 @@ spec:
           volumeMounts:
             - name: wordpress-data
               mountPath: /var/www/html
+          env:
+            - name: WORDPRESS_DATABASE_HOST
+              value: "mariadb"
+            - name: WORDPRESS_DATABASE_USER
+              value: {{ .Values.mariadb.mariadbUser }}
+            - name: WORDPRESS_DATABASE_PASSWORD
+              value: {{ .Values.mariadb.mariadbPassword }}
+            - name: WORDPRESS_DATABASE_NAME
+              value: {{ .Values.mariadb.mariadbDatabase }}
 
       volumes:
         - name: wordpress-data

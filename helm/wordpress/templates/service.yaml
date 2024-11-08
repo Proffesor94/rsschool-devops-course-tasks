@@ -18,8 +18,10 @@ metadata:
   name: mariadb
   namespace: {{ .Values.namespace }}
 spec:
+  type: ClusterIP
   selector:
     app: mariadb
   ports:
-    - port: 3306
+    - protocol: TCP
+      port: 3306
       targetPort: 3306

@@ -144,7 +144,7 @@ resource "aws_instance" "k3s_control_plane" {
               ./get_helm.sh
               mkdir -p /opt/conf/task_4
               git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
-              helm install wordpress ./opt/conf/task_4/helm/wordpress/ -f /opt/conf/task_4/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
+              helm install wordpress ./opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               EOF
 }
 
