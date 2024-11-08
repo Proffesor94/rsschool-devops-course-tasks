@@ -73,26 +73,27 @@ resource "aws_instance" "k3s_control_plane" {
 
               # Update system and install required packages for extending unified memory
               apt-get update -y
-              apt-get install -y curl linux-modules-extra-$(uname -r)
+              apt-get install -y curl
+              #apt-get install -y curl linux-modules-extra-$(uname -r)
 
-              # Configure zRAM
-              modprobe zram
-
-              # Create persistent module loading configuration
-              echo "zram" > /etc/modules-load.d/zram.conf
-              echo "options zram num_devices=1" > /etc/modprobe.d/zram.conf
-
-              # Calculate zRAM size (100% of total RAM)
-              TOTALMEM=$(free | grep -e "^Mem:" | awk '{print $2}')
-              ZRAM_SIZE=$TOTALMEM
-
-              # Configure compression algorithm to lzo-rle
-              echo "lzo-rle" > /sys/block/zram0/comp_algorithm
-
-              # Create udev rule for zRAM device
-              cat << 'UDEVRULE' > /etc/udev/rules.d/99-zram.rules
-              KERNEL=="zram0", ATTR{disksize}="$ZRAM_SIZE"K" RUN="/usr/bin/mkswap -L zram0 /dev/zram0", TAG+="systemd"
-              UDEVRULE
+              ## Configure zRAM
+              #modprobe zram
+              #
+              ## Create persistent module loading configuration
+              #echo "zram" > /etc/modules-load.d/zram.conf
+              #echo "options zram num_devices=1" > /etc/modprobe.d/zram.conf
+              #
+              ## Calculate zRAM size (100% of total RAM)
+              #TOTALMEM=$(free | grep -e "^Mem:" | awk '{print $2}')
+              #ZRAM_SIZE=$TOTALMEM
+              #
+              ## Configure compression algorithm to lzo-rle
+              #echo "lzo-rle" > /sys/block/zram0/comp_algorithm
+              #
+              ## Create udev rule for zRAM device
+              #cat << 'UDEVRULE' > /etc/udev/rules.d/99-zram.rules
+              #KERNEL=="zram0", ATTR{disksize}="$ZRAM_SIZE"K" RUN="/usr/bin/mkswap -L zram0 /dev/zram0", TAG+="systemd"
+              #UDEVRULE
 
               # Create and configure regular swap partition (1GB)
               dd if=/dev/zero of=/swapfile bs=1M count=1024
@@ -101,8 +102,8 @@ resource "aws_instance" "k3s_control_plane" {
               swapon -p 100 /swapfile
 
               # Add swap entries to fstab
-              grep -q "^/dev/zram0" /etc/fstab || echo "/dev/zram0 none swap defaults,pri=100 0 0" >> /etc/fstab
-              grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw,pri=-2 0 0" >> /etc/fstab
+              #grep -q "^/dev/zram0" /etc/fstab || echo "/dev/zram0 none swap defaults,pri=-2 0 0" >> /etc/fstab
+              grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw,pri=100 0 0" >> /etc/fstab
 
               # Reload systemd and udev
               systemctl daemon-reload
@@ -118,10 +119,10 @@ resource "aws_instance" "k3s_control_plane" {
               # Apply sysctl settings
               sysctl -p /etc/sysctl.d/99-zram.conf
 
-              # Initialize zRAM device
-              echo "$${ZRAM_SIZE}K" > /sys/block/zram0/disksize
-              mkswap -L zram0 /dev/zram0
-              swapon -p -2 /dev/zram0 # Yes, with lower priority than the regular swap because of limited CPU.
+              ## Initialize zRAM device
+              #echo "$${ZRAM_SIZE}K" > /sys/block/zram0/disksize
+              #mkswap -L zram0 /dev/zram0
+              #swapon -p -2 /dev/zram0 # Yes, with lower priority than the regular swap because of limited CPU.
 
               # Install and configure K3s
               curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s - --token ${var.k3s_token}
@@ -142,8 +143,8 @@ resource "aws_instance" "k3s_control_plane" {
               chmod 700 get_helm.sh
               ./get_helm.sh
               mkdir -p /opt/conf/task_4
-              git clone -b task_4 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_4
-              helm install jenkins /opt/conf/task_4/helm/ -f /opt/conf/task_4/helm//values.yaml --set jenkins.service.nodePort=32000
+              git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
+              helm install wordpress ./opt/conf/task_4/helm/wordpress/ -f /opt/conf/task_4/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               EOF
 }
 

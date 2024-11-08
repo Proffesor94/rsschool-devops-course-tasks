@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.wordpress.replicas }}
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      serviceAccountName: {{ .Values.wordpress.serviceAccountName }}
+
+      # Add Init Container for setting permissions
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          securityContext:
+            runAsUser: 0  # Run as root for setting up permissions
+          command: ["sh", "-c", "chown -R 1000:1000 /var/www/html"]
+          volumeMounts:
+            - name: wordpress-data
+              mountPath: /var/www/html
+
+      containers:
+        - name: wordpress
+          image: {{ .Values.wordpress.image }}
+          resources:
+            limits:
+              memory: {{ .Values.wordpress.resources.limits.memory }}
+              cpu: {{ .Values.wordpress.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.wordpress.resources.requests.memory }}
+              cpu: {{ .Values.wordpress.resources.requests.cpu }}
+          ports:
+            - name: httpport
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: wordpress-data
+              mountPath: /var/www/html
+
+      volumes:
+        - name: wordpress-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.wordpress.storage.pvc.name }}

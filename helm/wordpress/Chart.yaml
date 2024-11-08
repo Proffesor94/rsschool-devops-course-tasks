@@ -1,0 +1,6 @@
+apiVersion: v2
+name: wordpress
+description: A Helm chart for deploying WordPress on K3s
+type: application
+version: 1.0.0
+appVersion: "5.7" # or put there the specific version of WordPress you want

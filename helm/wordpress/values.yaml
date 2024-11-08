@@ -1,0 +1,57 @@
+namespace: wordpress
+
+wordpress:
+  image: "bitnami/wordpress:latest"   # Default WordPress image from Bitnami
+  serviceAccountName: wordpress-admin # Optional: Define if custom permissions needed
+  replicas: 1                         # Single replica for WordPress
+
+  # Persistent storage configuration for WordPress data
+  storage:
+    accessMode: ReadWriteOnce         # Ensures data is writable by only one node at a time
+    size: 10Gi                        # Adjusted storage size for WordPress requirements
+    pv:
+      name: wordpress-pv              # Persistent Volume for WordPress
+      storageClassName: local-storage # Same storage class for persistence
+      hostPath: "/mnt/data/wordpress" # Directory on the node for WordPress data
+    pvc:
+      name: wordpress-pv-claim        # Persistent Volume Claim for WordPress
+
+  # Resource allocation for WordPress
+  resources:
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+
+  # Service configuration
+  service:
+    type: NodePort              # Exposes service on a specific port
+    nodePort: 32000             # Set to 32000 for external access
+    port: 80                    # Standard HTTP port for WordPress access
+
+mariadb:
+  enabled: true                          # Enables MariaDB for WordPress database
+  image: "bitnami/mariadb:latest"        # Default MariaDB image from Bitnami
+  mariadbRootPassword: "mariadbpassword" # Replace with a secure password
+  mariadbDatabase: "wordpress_db"        # Name of the WordPress database
+  mariadbUser: "wpuser"                  # Database user for WordPress
+  mariadbPassword: "wppassword"          # Replace with a secure password
+
+  # Persistent storage configuration for MariaDB data
+  storage:
+    accessMode: ReadWriteOnce            # Write permissions limited to one node
+    size: 5Gi                            # Storage size appropriate for the database
+    pv:
+      name: mariadb-pv                   # Persistent Volume for MariaDB
+      storageClassName: local-storage    # Same storage class for persistence
+      hostPath: "/mnt/data/mariadb"      # Directory on the node for MariaDB data
+    pvc:
+      name: mariadb-pv-claim             # Persistent Volume Claim for MariaDB
+
+storageClass:
+  enabled: true
+  name: local-storage
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
