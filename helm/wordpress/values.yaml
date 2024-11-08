@@ -1,3 +1,5 @@
+namespace: wordpress
+
 wordpress:
   image: "bitnami/wordpress:latest"
   serviceAccountName: wordpress-admin
