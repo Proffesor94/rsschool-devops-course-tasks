@@ -5,10 +5,21 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   selector:
-    app: wordpress-server
+    app: wordpress
   type: NodePort
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 80
+      targetPort: 80
       nodePort: {{ .Values.wordpress.service.nodePort }}
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - port: 3306
+      targetPort: 3306

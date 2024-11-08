@@ -18,12 +18,11 @@ spec:
         runAsUser: 1000
       serviceAccountName: {{ .Values.wordpress.serviceAccountName }}
 
-      # Add Init Container for setting permissions
       initContainers:
         - name: init-permissions
           image: busybox
           securityContext:
-            runAsUser: 0  # Run as root for setting up permissions
+            runAsUser: 0
           command: ["sh", "-c", "chown -R 1000:1000 /var/www/html"]
           volumeMounts:
             - name: wordpress-data

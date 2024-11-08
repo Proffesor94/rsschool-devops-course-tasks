@@ -165,26 +165,27 @@ resource "aws_instance" "k3s_worker" {
 
               # Update system and install required packages for extending unified memory
               apt-get update -y
-              apt-get install -y curl linux-modules-extra-$(uname -r)
+              apt-get install -y curl 
+              #apt-get install -y linux-modules-extra-$(uname -r)
 
-              # Configure zRAM
-              modprobe zram
-
-              # Create persistent module loading configuration
-              echo "zram" > /etc/modules-load.d/zram.conf
-              echo "options zram num_devices=1" > /etc/modprobe.d/zram.conf
-
-              # Calculate zRAM size (100% of total RAM)
-              TOTALMEM=$(free | grep -e "^Mem:" | awk '{print $2}')
-              ZRAM_SIZE=$TOTALMEM
-
-              # Configure compression algorithm to lzo-rle
-              echo "lzo-rle" > /sys/block/zram0/comp_algorithm
-
-              # Create udev rule for zRAM device
-              cat << 'UDEVRULE' > /etc/udev/rules.d/99-zram.rules
-              KERNEL=="zram0", ATTR{disksize}="$ZRAM_SIZE"K" RUN="/usr/bin/mkswap -L zram0 /dev/zram0", TAG+="systemd"
-              UDEVRULE
+              ## Configure zRAM
+              #modprobe zram
+              #
+              ## Create persistent module loading configuration
+              #echo "zram" > /etc/modules-load.d/zram.conf
+              #echo "options zram num_devices=1" > /etc/modprobe.d/zram.conf
+              # 
+              ## Calculate zRAM size (100% of total RAM)
+              #TOTALMEM=$(free | grep -e "^Mem:" | awk '{print $2}')
+              #ZRAM_SIZE=$TOTALMEM
+              #
+              ## Configure compression algorithm to lzo-rle
+              #echo "lzo-rle" > /sys/block/zram0/comp_algorithm
+              #
+              ## Create udev rule for zRAM device
+              #cat << 'UDEVRULE' > /etc/udev/rules.d/99-zram.rules
+              #KERNEL=="zram0", ATTR{disksize}="$ZRAM_SIZE"K" RUN="/usr/bin/mkswap -L zram0 /dev/zram0", TAG+="systemd"
+              #UDEVRULE
 
               # Create and configure regular swap partition (1GB)
               dd if=/dev/zero of=/swapfile bs=1M count=1024
@@ -193,8 +194,8 @@ resource "aws_instance" "k3s_worker" {
               swapon -p 100 /swapfile
 
               # Add swap entries to fstab
-              grep -q "^/dev/zram0" /etc/fstab || echo "/dev/zram0 none swap defaults,pri=100 0 0" >> /etc/fstab
-              grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw,pri=-2 0 0" >> /etc/fstab
+              #grep -q "^/dev/zram0" /etc/fstab || echo "/dev/zram0 none swap defaults,pri=-2 0 0" >> /etc/fstab
+              grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw,pri=100 0 0" >> /etc/fstab
 
               # Reload systemd and udev
               systemctl daemon-reload
@@ -210,10 +211,10 @@ resource "aws_instance" "k3s_worker" {
               # Apply sysctl settings
               sysctl -p /etc/sysctl.d/99-zram.conf
 
-              # Initialize zRAM device
-              echo "$${ZRAM_SIZE}K" > /sys/block/zram0/disksize
-              mkswap -L zram0 /dev/zram0
-              swapon -p -2 /dev/zram0 # Yes, with lower priority than the regular swap because of limited CPU.
+              ## Initialize zRAM device
+              #echo "$${ZRAM_SIZE}K" > /sys/block/zram0/disksize
+              #mkswap -L zram0 /dev/zram0
+              #swapon -p -2 /dev/zram0 # Yes, with lower priority than the regular swap because of limited CPU.
               
               # Install and configure K3S agent
               until nc -z ${aws_instance.k3s_control_plane.private_ip} 6443; do
