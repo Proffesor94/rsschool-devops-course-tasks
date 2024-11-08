@@ -9,15 +9,3 @@ spec:
   resources:
     requests:
       storage: {{ .Values.wordpress.storage.size }}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ .Values.mariadb.storage.pvc.name }}
-  namespace: {{ .Values.namespace }}
-spec:
-  accessModes:
-    - {{ .Values.mariadb.storage.accessMode }}
-  resources:
-    requests:
-      storage: {{ .Values.mariadb.storage.size }}

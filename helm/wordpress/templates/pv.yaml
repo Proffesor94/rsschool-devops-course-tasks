@@ -6,24 +6,12 @@ metadata:
     type: local
 spec:
   storageClassName: {{ .Values.wordpress.storage.pv.storageClassName }}
+  claimRef:
+    name: {{ .Values.wordpress.storage.pvc.name }}
+    namespace: {{ .Values.namespace }}
   capacity:
     storage: {{ .Values.wordpress.storage.size }}
   accessModes:
     - {{ .Values.wordpress.storage.accessMode }}
   hostPath:
     path: {{ .Values.wordpress.storage.pv.hostPath }}
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ .Values.mariadb.storage.pv.name }}
-  labels:
-    type: local
-spec:
-  storageClassName: {{ .Values.mariadb.storage.pv.storageClassName }}
-  capacity:
-    storage: {{ .Values.mariadb.storage.size }}
-  accessModes:
-    - {{ .Values.mariadb.storage.accessMode }}
-  hostPath:
-    path: {{ .Values.mariadb.storage.pv.hostPath }}

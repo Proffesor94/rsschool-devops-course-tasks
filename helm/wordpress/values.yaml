@@ -4,8 +4,6 @@ wordpress:
   image: "bitnami/wordpress:latest"
   serviceAccountName: wordpress-admin
   replicas: 1
-
-  # Persistent storage for WordPress
   storage:
     accessMode: ReadWriteOnce
     size: 10Gi
@@ -15,8 +13,6 @@ wordpress:
       hostPath: "/mnt/data/wordpress"
     pvc:
       name: wordpress-pv-claim
-
-  # Resources for WordPress
   resources:
     limits:
       memory: "1Gi"
@@ -24,8 +20,6 @@ wordpress:
     requests:
       memory: "512Mi"
       cpu: "250m"
-
-  # Service configuration
   service:
     type: NodePort
     nodePort: 32000
@@ -34,12 +28,10 @@ wordpress:
 mariadb:
   enabled: true
   image: "bitnami/mariadb:latest"
-  mariadbRootPassword: "mariadbpassword"  # Use a secure password
+  mariadbRootPassword: "mariadbpassword"
   mariadbDatabase: "wordpress_db"
   mariadbUser: "wpuser"
-  mariadbPassword: "wppassword"  # Use a secure password
-
-  # Persistent storage for MariaDB
+  mariadbPassword: "wppassword"
   storage:
     accessMode: ReadWriteOnce
     size: 5Gi
