@@ -8,7 +8,7 @@ spec:
   storageClassName: local-path
   resources:
     requests:
-      storage: {{ .Values.wordpress.persistence.size }}
+      storage: 10Gi
 
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -20,4 +20,4 @@ spec:
   storageClassName: local-path
   resources:
     requests:
-      storage: {{ .Values.mysql.persistence.size }}
+      storage: 8Gi
