@@ -10,13 +10,15 @@ spec:
     nodePort: {{ .Values.wordpress.service.nodePort }}
   selector:
     app: wordpress
-
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql
 spec:
   ports:
-  - port: 3306
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
   selector:
     app: mysql
