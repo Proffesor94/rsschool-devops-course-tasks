@@ -30,6 +30,17 @@ wordpress:
     type: NodePort
     nodePort: 32000
     port: 80
+  env:
+    - name: WORDPRESS_DATABASE_HOST
+      value: "mariadb.wordpress.svc.cluster.local"  # FQDN for Kubernetes DNS resolution
+    - name: WORDPRESS_DATABASE_NAME
+      value: "wordpress_db"
+    - name: WORDPRESS_DATABASE_USER
+      value: "wpuser"
+    - name: WORDPRESS_DATABASE_PASSWORD
+      value: "wppassword"
+    - name: WORDPRESS_PASSWORD
+      value: "adminpassword"
 
 mariadb:
   enabled: true
