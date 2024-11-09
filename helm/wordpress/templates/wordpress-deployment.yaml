@@ -12,6 +12,16 @@ spec:
       labels:
         app: wordpress
     spec:
+    # Add Init Container 
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        securityContext:
+          runAsUser: 0  # Run Init Container as root
+          command: ["sh", "-c", "mkdir -p /mnt/data/wordpress && chmod 777 /mnt/data/wordpress"]
+          volumeMounts:
+            - name: host-path
+              mountPath: /mnt/data
       containers:
       - name: wordpress
         image: {{ .Values.wordpress.image.repository }}:{{ .Values.wordpress.image.tag }}
