@@ -19,8 +19,8 @@ spec:
           runAsUser: 0
         command: ["sh", "-c", "mkdir -p /mnt/data/mysql && chmod 777 /mnt/data/mysql"]
         volumeMounts:
-          - name: host-path
-            mountPath: /mnt/data
+        - name: host-path
+          mountPath: /mnt/data
       containers:
       - name: mysql
         image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
