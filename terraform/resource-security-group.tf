@@ -109,7 +109,7 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
- # Allow MySQL communication
+  # Allow MySQL communication
   ingress {
     from_port   = 3306
     to_port     = 3306
@@ -171,7 +171,7 @@ resource "aws_security_group" "mysql_sg" {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.k3s_sg.id]  # Allow access from k3s nodes
+    security_groups = [aws_security_group.k3s_sg.id] # Allow access from k3s nodes
     cidr_blocks     = [var.vpc_cidr_block]           # Allow access from within VPC
   }
 
