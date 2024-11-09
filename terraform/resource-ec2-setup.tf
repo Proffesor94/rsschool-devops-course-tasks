@@ -17,12 +17,29 @@ resource "aws_instance" "bastion" {
               server {
                   listen 8080;
 
+                  # Increase timeout settings
+                  proxy_connect_timeout 600;
+                  proxy_send_timeout    600;
+                  proxy_read_timeout    600;
+                  send_timeout         600;
+
                   location / {
                       proxy_pass http://${aws_instance.k3s_worker.private_ip}:32000;
                       proxy_set_header Host $host;
                       proxy_set_header X-Real-IP $remote_addr;
                       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                       proxy_set_header X-Forwarded-Proto $scheme;
+
+                      # Add these fastcgi timeout settings
+                      fastcgi_read_timeout 600;
+                      fastcgi_send_timeout 600;
+                      fastcgi_connect_timeout 600;
+
+                      # Add these to handle larger uploads
+                      client_max_body_size 64M;
+                      proxy_buffer_size 128k;
+                      proxy_buffers 4 256k;
+                      proxy_busy_buffers_size 256k;
                   }
               }
               NGINXCONF
@@ -33,7 +50,7 @@ resource "aws_instance" "bastion" {
   tags = {
     Name    = "Bastion Host"
     Owner   = "Pavel Shumilin"
-    Project = "Task 4"
+    Project = "Task 5"
   }
 }
 
