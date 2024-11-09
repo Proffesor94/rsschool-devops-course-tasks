@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -12,34 +13,22 @@ spec:
       labels:
         app: mysql
     spec:
-      initContainers:
-      - name: init-permissions
-        image: busybox
-        securityContext:
-          runAsUser: 0
-        command: ["sh", "-c", "mkdir -p /mnt/data/mysql && chmod 777 /mnt/data/mysql"]
-        volumeMounts:
-        - name: host-path
-          mountPath: /mnt/data
       containers:
-      - name: mysql
-        image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: {{ .Values.mysql.env.MYSQL_ROOT_PASSWORD }}
-        - name: MYSQL_DATABASE
-          value: {{ .Values.mysql.env.MYSQL_DATABASE }}
-        - name: MYSQL_USER
-          value: {{ .Values.mysql.env.MYSQL_USER }}
-        - name: MYSQL_PASSWORD
-          value: {{ .Values.mysql.env.MYSQL_PASSWORD }}
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
+        - name: mysql
+          image: {{ .Values.mysql.image }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.rootPassword }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.database }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.user }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.mysql.password }}
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
       volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pvc
-      - name: host-path
-        hostPath:
-          path: /mnt/data
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

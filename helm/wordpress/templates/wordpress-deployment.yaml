@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wordpress
+  namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.wordpress.replicaCount }}
   selector:
     matchLabels:
       app: wordpress
@@ -12,36 +13,31 @@ spec:
       labels:
         app: wordpress
     spec:
-      initContainers:
-      - name: init-permissions
-        image: busybox
-        securityContext:
-          runAsUser: 0
-        command: ["sh", "-c", "mkdir -p /mnt/data/wordpress && chmod 777 /mnt/data/wordpress"]
-        volumeMounts:
-        - name: host-path
-          mountPath: /mnt/data
       containers:
-      - name: wordpress
-        image: wordpress:latest
-        ports:
-        - containerPort: 80
-        env:
-        - name: WORDPRESS_DB_HOST
-          value: mysql
-        - name: WORDPRESS_DB_USER
-          value: wordpress
-        - name: WORDPRESS_DB_PASSWORD
-          value: wordpress-pass
-        - name: WORDPRESS_DB_NAME
-          value: wordpress
-        volumeMounts:
-        - name: wordpress-persistent-storage
-          mountPath: /var/www/html
+        - name: wordpress
+          image: {{ .Values.wordpress.image }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: "mysql:3306"
+            - name: WORDPRESS_DB_NAME
+              value: {{ .Values.mysql.database }}
+            - name: WORDPRESS_DB_USER
+              value: {{ .Values.mysql.user }}
+            - name: WORDPRESS_DB_PASSWORD
+              value: {{ .Values.mysql.password }}
+          resources:
+            requests:
+              memory: {{ .Values.wordpress.resources.requests.memory }}
+              cpu: {{ .Values.wordpress.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.wordpress.resources.limits.memory }}
+              cpu: {{ .Values.wordpress.resources.limits.cpu }}
+          volumeMounts:
+            - name: wordpress-persistent-storage
+              mountPath: /var/www/html
       volumes:
-      - name: wordpress-persistent-storage
-        persistentVolumeClaim:
-          claimName: wordpress-pvc
-      - name: host-path
-        hostPath:
-          path: /mnt/data
+        - name: wordpress-persistent-storage
+          persistentVolumeClaim:
+            claimName: wordpress-pvc
