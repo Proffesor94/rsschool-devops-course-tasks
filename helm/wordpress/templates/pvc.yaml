@@ -1,11 +1,21 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.wordpress.storage.pvc.name }}
-  namespace: {{ .Values.namespace }}
+  name: wordpress-pvc
 spec:
   accessModes:
-    - {{ .Values.wordpress.storage.accessMode }}
+    - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.wordpress.storage.size }}
+      storage: {{ .Values.wordpress.persistence.size }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.persistence.size }}

@@ -1,60 +1,30 @@
-namespace: wordpress
-
 wordpress:
-  image: "bitnami/wordpress:latest"
-  serviceAccountName: wordpress-admin
-  replicas: 1
-  storage:
-    accessMode: ReadWriteOnce
+  image:
+    repository: wordpress
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  persistence:
+    enabled: true
     size: 10Gi
-    pv:
-      name: wordpress-pv
-      storageClassName: local-storage
-      hostPath: "/mnt/data/wordpress"
-    pvc:
-      name: wordpress-pv-claim
-  resources:
-    limits:
-      memory: "1Gi"
-      cpu: "500m"
-    requests:
-      memory: "512Mi"
-      cpu: "250m"
+    
   service:
     type: NodePort
-    nodePort: 32000
     port: 80
+    nodePort: 32000
+
+mysql:
+  image:
+    repository: mysql
+    tag: 5.7
+    pullPolicy: IfNotPresent
+    
+  persistence:
+    enabled: true
+    size: 8Gi
+    
   env:
-    - name: WORDPRESS_DATABASE_HOST
-      value: "mariadb.wordpress.svc.cluster.local"  # FQDN for Kubernetes DNS resolution
-    - name: WORDPRESS_DATABASE_NAME
-      value: "wordpress_db"
-    - name: WORDPRESS_DATABASE_USER
-      value: "wpuser"
-    - name: WORDPRESS_DATABASE_PASSWORD
-      value: "wppassword"
-    - name: WORDPRESS_PASSWORD
-      value: "adminpassword"
-
-mariadb:
-  enabled: true
-  image: "bitnami/mariadb:latest"
-  mariadbRootPassword: "mariadbpassword"
-  mariadbDatabase: "wordpress_db"
-  mariadbUser: "wpuser"
-  mariadbPassword: "wppassword"
-  storage:
-    accessMode: ReadWriteOnce
-    size: 5Gi
-    pv:
-      name: mariadb-pv
-      storageClassName: local-storage
-      hostPath: "/mnt/data/mariadb"
-    pvc:
-      name: mariadb-pv-claim
-
-storageClass:
-  enabled: true
-  name: local-storage
-  provisioner: kubernetes.io/no-provisioner
-  volumeBindingMode: WaitForFirstConsumer
+    MYSQL_ROOT_PASSWORD: wordpress-pass
+    MYSQL_DATABASE: wordpress
+    MYSQL_USER: wordpress
+    MYSQL_PASSWORD: wordpress-pass
