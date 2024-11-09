@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - main
-      - task_2
-      - task-3
+      - task_5
   pull_request:
     branches:
       - main
-      - task_2
-      - task-3
+      - task_5
 
 permissions:
   id-token: write   # Required for requesting the JWT

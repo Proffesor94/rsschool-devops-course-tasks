@@ -1,0 +1,11 @@
+# https://helm.sh/docs/topics/charts/#the-chartyaml-file
+apiVersion: v2
+name: my-wordpress
+description: A Helm chart for deploying WordPress
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Kirill Kazarin
+    email: ka.kazarin@gmail.com
+    url: https://github.com/kazarin-ka
+

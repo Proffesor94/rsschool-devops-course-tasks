@@ -1,4 +1,4 @@
-# rsschool-devops-course-tasks
+## rsschool-devops-course-tasks
 
 ## Table of Contents
 

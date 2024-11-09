@@ -8,10 +8,10 @@ output "control_plane_private_ip" {
   description = "Private IP of the K3s Control Plane Node"
 }
 
-output "worker_private_ip" {
-  value       = aws_instance.k3s_worker.private_ip
-  description = "Private IP of the K3s Worker Node"
-}
+#output "worker_private_ip" {
+#  value       = aws_instance.k3s_worker.private_ip
+#  description = "Private IP of the K3s Worker Node"
+#}
 
 output "nat_instance_ip" {
   value       = aws_eip.nat_eip.public_ip

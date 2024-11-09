@@ -1,0 +1,28 @@
+namespace: wordpress
+
+wordpress:
+  image: "wordpress:latest"
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30080
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+  persistentVolume:
+    size: 1Gi
+
+mysql:
+  enabled: true
+  image: "mysql:5.7"
+  rootPassword: "root_password"
+  database: "wordpress_db"
+  user: "wordpress_user"
+  password: "wordpress_password"
+  persistentVolume:
+    size: 1Gi
