@@ -30,3 +30,7 @@ storageClass:
   name: local-storage
   provisioner: kubernetes.io/no-provisioner
   volumeBindingMode: WaitForFirstConsumer
+
+jenkinsUser: user
+
+jenkinsPassword: "12345"
