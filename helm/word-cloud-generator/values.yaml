@@ -1,0 +1,21 @@
+# Default values for the chart
+image:
+  repository: 182399711446.dkr.ecr.eu-north-1.amazonaws.com/word-cloud-generator
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8888
+  nodePort: 30007 
+
+replicaCount: 1
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+namespace: default # Add a default namespace
