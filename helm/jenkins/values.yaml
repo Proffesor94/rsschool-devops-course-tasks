@@ -1,7 +1,7 @@
 namespace: jenkins
 
 jenkins:
-  image: "bitnami/jenkins:latest"
+  image: "jenkins/jenkins:latest"
   serviceAccountName: jenkins-admin
   replicas: 1
   storage:
@@ -30,7 +30,3 @@ storageClass:
   name: local-storage
   provisioner: kubernetes.io/no-provisioner
   volumeBindingMode: WaitForFirstConsumer
-
-jenkinsUser: user
-
-jenkinsPassword: "12345"
