@@ -1,7 +1,7 @@
 namespace: jenkins
 
 jenkins:
-  image: "jenkins/jenkins:lts"
+  image: "bitnami/jenkins:latest"
   serviceAccountName: jenkins-admin
   replicas: 1
   storage:

@@ -70,6 +70,13 @@ resource "aws_security_group" "nat_instance_sg" {
     cidr_blocks = [var.vpc_cidr_block]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -95,6 +102,7 @@ resource "aws_security_group" "k3s_sg" {
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
+  # Kubernetes API Server
   ingress {
     from_port   = 6443
     to_port     = 6443
@@ -102,6 +110,7 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = [var.vpc_cidr_block]
   }
 
+  # NodePort services (adjust range as needed)
   ingress {
     from_port   = 30000
     to_port     = 32767
@@ -109,7 +118,7 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow MySQL communication
+  # MySQL communication within the VPC
   ingress {
     from_port   = 3306
     to_port     = 3306
@@ -117,7 +126,7 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = [var.vpc_cidr_block]
   }
 
-  # Allow inbound HTTP
+  # HTTP and HTTPS for external access
   ingress {
     from_port   = 80
     to_port     = 80
@@ -125,7 +134,6 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow inbound HTTPS
   ingress {
     from_port   = 443
     to_port     = 443
@@ -133,20 +141,20 @@ resource "aws_security_group" "k3s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow inbound ephemeral ports
+  # Optional: Remove or restrict ephemeral ports
   ingress {
     from_port   = 1024
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.vpc_cidr_block]
   }
 
-  # Allow inbound ICMP
+  # Optional: Restrict ICMP traffic
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.vpc_cidr_block]
   }
 
   egress {
@@ -159,31 +167,5 @@ resource "aws_security_group" "k3s_sg" {
   tags = {
     Name    = "k3s Security Group"
     Project = "Task 3"
-  }
-}
-
-resource "aws_security_group" "mysql_sg" {
-  name        = "mysql-sg"
-  description = "Allow MySQL communication"
-  vpc_id      = aws_vpc.task_3_vpc.id
-
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.k3s_sg.id] # Allow access from k3s nodes
-    cidr_blocks     = [var.vpc_cidr_block]           # Allow access from within VPC
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name    = "MySQL Security Group"
-    Project = "Task 5"
   }
 }
