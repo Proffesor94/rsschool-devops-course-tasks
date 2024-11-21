@@ -237,6 +237,7 @@ resource "aws_instance" "k3s_control_plane" {
               #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
               #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               git clone -b task_6 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_6
+              kubectl wait --for=condition=Available deployment/coredns -n kube-system --timeout=180s --initial-delay=10 --period=5
               helm install jenkins /opt/conf/task_6/helm/jenkins/ -f /opt/conf/task_6/helm/jenkins/values.yaml --set jenkins.service.nodePort=32000
               EOF
 }
