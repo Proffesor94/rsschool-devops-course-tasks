@@ -11,6 +11,6 @@ spec:
     - port: 8080
       targetPort: 8080
       nodePort: {{ .Values.jenkins.service.nodePort }}
-    - name: jnlpport
-      port: 50000
+    - port: 50000
       targetPort: 50000
+      name: jnlpport
