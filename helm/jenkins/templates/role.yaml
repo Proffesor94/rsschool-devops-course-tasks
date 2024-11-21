@@ -4,9 +4,16 @@ metadata:
   name: jenkins
   namespace: {{ .Values.namespace }} # Role is now namespace-scoped
 rules:
-  - apiGroups: [""]
-    resources: ["pods", "services", "secrets", "configmaps"] # More specific permissions
-    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
-  - apiGroups: ["apps"]
-    resources: ["deployments", "replicasets", "statefulsets"]
-    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create","delete","get","list","patch","update","watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create","delete","get","list","patch","update","watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get","list","watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
