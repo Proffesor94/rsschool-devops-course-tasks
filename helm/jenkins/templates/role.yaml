@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role  # Changed from ClusterRole
 metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
   name: jenkins
+  namespace: {{ .Values.namespace }} # Role is now namespace-scoped
 rules:
   - apiGroups: [""]
-    resources: ["*"]
-    verbs: ["*"]
+    resources: ["pods", "services", "secrets", "configmaps"] # More specific permissions
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]

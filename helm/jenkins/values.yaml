@@ -2,7 +2,7 @@ namespace: jenkins
 
 jenkins:
   image: "jenkins/jenkins:lts-jdk17"
-  serviceAccountName: jenkins-admin
+  serviceAccountName: jenkins
   replicas: 1
   storage:
     accessMode: ReadWriteOnce
