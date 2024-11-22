@@ -1,9 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  namespace: jenkins  # Important: Specify the namespace here
-  name: jenkins-role
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: jenkins
 rules:
-  - apiGroups: ["apps", "extensions", ""] # Include "" for core API resources like services
-    resources: ["deployments", "replicasets", "pods", "services", "configmaps", "secrets", "serviceaccounts"] # List all resources Jenkins needs
-    verbs: ["*"] # Or specify more restrictive verbs if possible: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps", ""]
+    resources: ["deployments","*"]
+    verbs: ["*"]
