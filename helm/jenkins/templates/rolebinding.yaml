@@ -1,12 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: jenkins-cluster-rolebinding
+  name: jenkins-rolebinding
+  namespace: jenkins  # Important: Specify the namespace here
 subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.jenkins.serviceAccountName }}
-    namespace: {{ .Values.namespace }}
+- kind: ServiceAccount
+  name: jenkins # Directly use "jenkins" if the service account is named "jenkins"
+  # Remove the templating if not needed: namespace: {{ .Values.namespace }} 
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: jenkins
+  kind: Role
+  name: jenkins-role
