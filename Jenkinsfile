@@ -6,18 +6,23 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: jenkins
   containers:
-    - name: jenkins-agent
-      image: jenkins/inbound-agent:latest
-      command:
-        - cat
-      tty: true
-      securityContext:
-        privileged: true
-    - name: docker
-      image: docker:dind
-      securityContext:
-        privileged: true
+  - name: jenkins-agent
+    image: jenkins/inbound-agent:latest
+    command:
+    - cat
+    tty: true
+    securityContext:
+      privileged: true
+  - name: docker
+    image: docker:dind
+    securityContext:
+      privileged: true
+  - name: helm
+    image: alpine/helm:3.11.1  # Helm container
+    command: ['cat']
+    tty: true
 """
         }
     }
@@ -27,12 +32,10 @@ spec:
         ECR_REPOSITORY = '182399711446.dkr.ecr.eu-north-1.amazonaws.com/word-cloud-generator'
         IMAGE_TAG = "latest"
         SONARQUBE_SCANNER = 'SonarQube Scanner'
-        KUBECONFIG_CREDENTIALS_ID = '1d78077e-a7f2-4810-83bf-473197cee94c'
         AWS_REGION = 'eu-north-1'
         DOCKERFILE_REPO = 'https://github.com/Proffesor94/rsschool-devops-course-tasks'
         DOCKERFILE_BRANCH = 'task_6'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -42,13 +45,15 @@ spec:
         stage('Prepare Docker') {
             steps {
                 container('docker') {
-                    sh 'dockerd-entrypoint.sh &>/dev/null &'
-                    sh 'sleep 20'
-                    sh "docker --version"
+                    sh 'dockerd-entrypoint.sh &>/dev/null &'   // Start Docker daemon
+                    sh 'sleep 20'                            // Wait for Docker to initialize
+                    sh 'apk add --no-cache aws-cli helm'         // Install AWS CLI and Helm
+                    sh 'aws --version'                       // Verify AWS CLI installation
+                    sh 'docker --version'                    // Verify Docker installation
+                    sh 'helm version --short'               // Verify Helm installation
                 }
             }
         }
-
         stage('Application Build') {
             steps {
                 container('docker') {
@@ -56,37 +61,34 @@ spec:
                 }
             }
         }
-
         stage('Push Docker Image to ECR') {
             steps {
                 script {
                     container('docker') {
                         withCredentials([aws(credentialsId: "${AWS_CREDENTIALS_ID}")]) {
-                            // Using aws ecr get-login-password 
+                            // Log in to ECR
                             sh """
-                                aws ecr get-login-password --region ${AWS_REGION} | docker login -u AWS --password-stdin ${ECR_REPOSITORY}
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login -u AWS --password-stdin ${ECR_REPOSITORY}
                             """
                         }
+                        // Push Docker image to ECR
                         sh "docker push ${ECR_REPOSITORY}:${IMAGE_TAG}"
                     }
                 }
             }
         }
-
         stage('Deploy to Kubernetes with Helm') {
-            agent {
-                kubernetes { label 'master' } 
-            }
             steps {
-                script {
-                     withCredentials([file(credentialsId: "${KUBECONFIG_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
-                        sh "helm upgrade --install word-cloud-generator ./helm/word-cloud-generator --set image.repository=${ECR_REPOSITORY} --set image.tag=${IMAGE_TAG} --kubeconfig $KUBECONFIG"
-                    }
+                container('helm') {
+                    sh """
+                    helm upgrade --install word-cloud-generator ./helm/word-cloud-generator \
+                        --set image.repository=${ECR_REPOSITORY} \
+                        --set image.tag=${IMAGE_TAG}
+                    """
                 }
             }
         }
     }
-
     post {
         always {
             cleanWs()
