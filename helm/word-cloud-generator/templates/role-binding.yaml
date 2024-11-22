@@ -2,11 +2,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: ecr-role-binding
-  namespace: default
+  namespace: jenkins
 subjects:
 - kind: ServiceAccount
   name: ecr-service-account
-  namespace: default
+  namespace: jenkins
 roleRef:
   kind: ClusterRole
   name: eksctl:pod-ecr-auth:default:ECRReadOnlyPolicy

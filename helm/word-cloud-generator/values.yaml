@@ -21,4 +21,4 @@ resources:
 imagePullSecrets:
   - name: ecr-secret
 
-namespace: default # Add a default namespace
+namespace: jenkins # Add a default namespace

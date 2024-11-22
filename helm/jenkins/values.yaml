@@ -6,7 +6,7 @@ jenkins:
   replicas: 1
   storage:
     accessMode: ReadWriteOnce
-    size: 8Gi
+    size: 10Gi
     pv:
       name: jenkins-pv
       storageClassName: local-storage
