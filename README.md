@@ -61,7 +61,7 @@ The built artifacts, including the Dockerfile and Helm chart, are stored in the 
 
 - [Helm Chart](https://github.com/Proffesor94/rsschool-devops-course-tasks/tree/task_6/helm/word-cloud-generator)
 - [Jenkinsfile](https://github.com/Proffesor94/rsschool-devops-course-tasks/blob/task_6/Jenkinsfile)
-- [Dockerfile] (https://github.com/Proffesor94/rsschool-devops-course-tasks/blob/task_6/Dockerfile)
+- [Dockerfile](https://github.com/Proffesor94/rsschool-devops-course-tasks/blob/task_6/Dockerfile)
 
 ## Repository Submission
 A repository is created containing the Dockerfile with application, Helm chart, and Jenkinsfile. This structure allows for easy access and management of the project components.
