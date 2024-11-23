@@ -131,6 +131,13 @@ spec:
     post {
         always {
             cleanWs()
+            mail(
+            subject: "Jenkins Build Result for ${env.JOB_NAME}",
+            body: "Build ${env.BUILD_NUMBER} of ${env.JOB_NAME} completed with status ${currentBuild.result}",
+            to: 'serfer94@gmail.com.com'
+            )
         }
     }
 }
+   
+   
