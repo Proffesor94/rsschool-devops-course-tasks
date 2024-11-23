@@ -82,6 +82,11 @@ spec:
             when { expression { params.PUSH_TO_ECR == true } }
             steps {
                 script {
+                    if (currentBuild.result != 'FAILURE') {  //Capture success (or unstable)
+                        env.PUSH_SUCCESSFUL = true
+                    } else {
+                        env.PUSH_SUCCESSFUL = false // Explicitly set to false on failure
+                        }
                     container('docker') {
                         withCredentials([aws(credentialsId: "${AWS_CREDENTIALS_ID}")]) {
                             // Log in to ECR
@@ -109,6 +114,7 @@ spec:
             }
         }
         stage('Deploy to Kubernetes with Helm') {
+            when { expression { params.PUSH_TO_ECR == true } }
             steps {
                 container('helm') {
                     sh """
