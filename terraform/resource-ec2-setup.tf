@@ -150,15 +150,15 @@ resource "aws_instance" "nat_instance" {
 
 # K3s Control Plane Node
 resource "aws_spot_instance_request" "k3s_control_plane" {
-  ami                    = var.aws_linux_ami
-  instance_type          = "t3.small"
-  key_name               = var.ssh_key_name
-  subnet_id              = aws_subnet.private_subnets[0].id
-  vpc_security_group_ids = [aws_security_group.k3s_sg.id]
-  spot_price             = "0.02"  # Set your maximum price
-  wait_for_fulfillment   = true
-  spot_type              = "persistent"  # Makes the request persistent
-  instance_interruption_behavior = "stop"  # Options: stop or terminate
+  ami                            = var.aws_linux_ami
+  instance_type                  = "t3.small"
+  key_name                       = var.ssh_key_name
+  subnet_id                      = aws_subnet.private_subnets[0].id
+  vpc_security_group_ids         = [aws_security_group.k3s_sg.id]
+  spot_price                     = "0.02" # Set your maximum price
+  wait_for_fulfillment           = true
+  spot_type                      = "persistent" # Makes the request persistent
+  instance_interruption_behavior = "stop"       # Options: stop or terminate
 
   root_block_device {
     volume_size = 20
