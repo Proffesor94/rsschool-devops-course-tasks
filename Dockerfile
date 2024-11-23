@@ -20,15 +20,3 @@ EXPOSE 8888
 
 # Run the application
 CMD ["/usr/local/bin/word-cloud-generator"]
-
-## Push the image to ECR (manual trigger)
-#FROM alpine:3.20 as ecr_push
-#
-#ARG REPOSITORY_URI
-#ARG VERSION
-#
-#RUN echo $REPOSITORY_URI:$VERSION > /dev/null
-#
-## Build and push the Docker image
-#RUN docker build -t ${REPOSITORY_URI}:${VERSION} . && \
-#    docker push ${REPOSITORY_URI}:${VERSION}
