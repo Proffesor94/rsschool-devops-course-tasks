@@ -1,0 +1,71 @@
+# Global settings - OK.
+global:
+  scrape_interval: 15s 
+  evaluation_interval: 15s 
+
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  service:
+    type: NodePort
+    nodePort: 32000  
+  replicas: 1 
+  resources:  
+    limits:
+      cpu: 500m 
+      memory: 1Gi 
+    requests:
+      cpu: 250m 
+      memory: 512Mi 
+  retention: 7d  
+  storageSpec: 
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi 
+        storageClassName: "gp2" 
+
+alertmanager:
+  enabled: false 
+
+grafana:
+  enabled: false  
+
+
+# Node Exporter configuration
+nodeExporter:
+  enabled: true
+  resources:  # These resource limits seem reasonable for a single-node setup.
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 25m
+      memory: 32Mi
+
+
+# Kube State Metrics configuration
+kubeStateMetrics:
+  enabled: true
+  resources:  
+    limits:
+      cpu: 200m 
+      memory: 256Mi 
+    requests:
+      cpu: 100m 
+      memory: 128Mi 
+
+
+
+# Prometheus Operator configuration - OK
+prometheusOperator:
+  enabled: true
+  replicas: 1  
+
+
+# RBAC configuration - OK
+rbac:
+  create: true 
