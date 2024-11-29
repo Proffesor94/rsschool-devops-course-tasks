@@ -1,44 +1,29 @@
-# Global settings - OK.
 global:
-  scrape_interval: 15s 
-  evaluation_interval: 15s 
-
+  scrape_interval: 15s # Default scraping interval
+  evaluation_interval: 15s # Rules evaluation interval
 
 # Prometheus configuration
 prometheus:
-  enabled: true
   service:
     type: NodePort
-    nodePort: 32000  
-  replicas: 1 
-  resources:  
+    nodePort: 32000 # Explicitly set NodePort to 32000
+  resources:
     limits:
-      cpu: 500m 
-      memory: 1Gi 
+      cpu: 200m
+      memory: 256Mi
     requests:
-      cpu: 250m 
-      memory: 512Mi 
-  retention: 7d  
-  storageSpec: 
-    volumeClaimTemplate:
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 5Gi 
-        storageClassName: "gp2" 
+      cpu: 100m
+      memory: 128Mi
+  retention: 7d # Retain metrics for 7 days
+  replicas: 1 # Single-node setup requires only 1 replica
 
+# Disable unnecessary components for resource optimization
 alertmanager:
-  enabled: false 
-
-grafana:
-  enabled: false  
-
+  enabled: false # Disable Alertmanager to save resources
 
 # Node Exporter configuration
 nodeExporter:
-  enabled: true
-  resources:  # These resource limits seem reasonable for a single-node setup.
+  resources:
     limits:
       cpu: 50m
       memory: 64Mi
@@ -46,26 +31,17 @@ nodeExporter:
       cpu: 25m
       memory: 32Mi
 
-
 # Kube State Metrics configuration
 kubeStateMetrics:
-  enabled: true
-  resources:  
+  resources:
     limits:
-      cpu: 200m 
-      memory: 256Mi 
+      cpu: 100m
+      memory: 128Mi
     requests:
-      cpu: 100m 
-      memory: 128Mi 
+      cpu: 50m
+      memory: 64Mi
 
-
-
-# Prometheus Operator configuration - OK
+# Prometheus Operator configuration
 prometheusOperator:
   enabled: true
-  replicas: 1  
-
-
-# RBAC configuration - OK
-rbac:
-  create: true 
+  replicas: 1 # Single replica is sufficient
