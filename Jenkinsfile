@@ -38,6 +38,12 @@ spec:
         GIT_REPO = 'https://github.com/wickett/word-cloud-generator.git' 
         GITHUB_REPO = 'https://github.com/Proffesor94/rsschool-devops-course-tasks'
         GITHUB_BRANCH = 'task_6'
+        SONAR_HOST_URL = 'https://sonarcloud.io'
+        SONAR_PROJECT_KEY = 'task-6-word-cloud-generator'
+        SONAR_ORGANIZATION = 'proffesor94'
+        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_SCANNER_VERSION = '6.2.1.4610'
+        SONAR_SCANNER_HOME = "$HOME/.sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64"
     }
     stages {
         stage('Checkout Dockerfile') {
@@ -55,7 +61,7 @@ spec:
                 container('docker') {
                     sh 'dockerd-entrypoint.sh &>/dev/null &' // Start Docker daemon
                     sh 'sleep 20'                            // Wait for Docker to initialize
-                    sh 'apk add --no-cache aws-cli kubectl'  // Install AWS CLI and Helm
+                    sh 'apk update && apk add --no-cache aws-cli kubectl'  // Install necessary tools
                     sh 'aws --version'                       // Verify AWS CLI installation
                     sh 'docker --version'                    // Verify Docker installation
                     sh 'kubectl version --client'            // Verify kubectl installation
@@ -68,6 +74,36 @@ spec:
                 container('docker') {
                     sh "docker build -t word-cloud-generator-builder -f Dockerfile --target builder ."  
                     sh "docker run --rm word-cloud-generator-builder go test -v ./..." 
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                container('docker') {
+                    script {
+                    // Install OpenJDK 17 if necessary (already in the docker container)
+                    sh """
+                      apk add --no-cache -q openjdk17
+                      export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+                      export PATH=\$JAVA_HOME/bin:\$PATH
+                      java -version
+                    """
+
+                    // Use SonarQubeScanner tool configured in Jenkins
+                    def scannerHome = tool 'SonarQubeScanner'
+
+                        // Run SonarQube analysis with appropriate parameters
+                        withSonarQubeEnv('SonarQube') {
+                          sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                              -Dsonar.projectKey=task-6-word-cloud-generator \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=https://sonarcloud.io \
+                              -Dsonar.login=${SONAR_TOKEN} \
+                              -Dsonar.organization=${SONAR_ORGANIZATION}
+                          """
+                        }
+                    }
                 }
             }
         }
@@ -137,5 +173,3 @@ spec:
         }
     }
 }
-   
-   
