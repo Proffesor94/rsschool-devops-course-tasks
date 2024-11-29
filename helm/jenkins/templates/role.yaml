@@ -7,6 +7,6 @@ metadata:
     kubernetes.io/bootstrapping: rbac-defaults
   name: jenkins
 rules:
-  - apiGroups: [""]
-    resources: ["*"]
+  - apiGroups: ["apps", ""]
+    resources: ["deployments","*"]
     verbs: ["*"]

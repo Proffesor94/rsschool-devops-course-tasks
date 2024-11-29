@@ -6,7 +6,7 @@ resource "aws_instance" "bastion" {
   key_name                    = var.ssh_key_name
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
-  depends_on                  = [aws_instance.k3s_control_plane]
+  depends_on                  = [aws_spot_instance_request.k3s_control_plane]
   user_data                   = <<-EOF
               #!/bin/bash
               set -e
@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
               # Create Nginx reverse proxy configuration
               cat << NGINXCONF > /etc/nginx/sites-available/reverse-proxy
               upstream backend {
-                  server ${aws_instance.k3s_control_plane.private_ip}:32000;
+                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32000;
                   keepalive 32;
               }
 
@@ -88,7 +88,7 @@ resource "aws_instance" "bastion" {
 
               # HTTP redirect
               server {
-                  listen 80;
+                  listen 8080;
                   server_name _;
                   return 301 https://\$host\$request_uri;
               }
@@ -114,7 +114,7 @@ resource "aws_instance" "bastion" {
   tags = {
     Name    = "Bastion Host"
     Owner   = "Pavel Shumilin"
-    Project = "Task 5"
+    Project = "Task 6"
   }
 }
 
@@ -149,12 +149,22 @@ resource "aws_instance" "nat_instance" {
 }
 
 # K3s Control Plane Node
-resource "aws_instance" "k3s_control_plane" {
-  ami                    = var.aws_linux_ami
-  instance_type          = "t3.micro"
-  key_name               = var.ssh_key_name
-  subnet_id              = aws_subnet.private_subnets[0].id
-  vpc_security_group_ids = [aws_security_group.k3s_sg.id]
+resource "aws_spot_instance_request" "k3s_control_plane" {
+  ami                            = var.aws_linux_ami
+  instance_type                  = "t3.small"
+  key_name                       = var.ssh_key_name
+  subnet_id                      = aws_subnet.private_subnets[0].id
+  vpc_security_group_ids         = [aws_security_group.k3s_sg.id]
+  spot_price                     = "0.02" # Set your maximum price
+  wait_for_fulfillment           = true
+  spot_type                      = "persistent" # Makes the request persistent
+  instance_interruption_behavior = "stop"       # Options: stop or terminate
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp2"
+  }
+
   tags = {
     Name = "k3s-control-plane"
   }
@@ -233,9 +243,13 @@ resource "aws_instance" "k3s_control_plane" {
               curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
               chmod 700 get_helm.sh
               ./get_helm.sh
-              mkdir -p /opt/conf/task_5
-              git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
-              helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
+              mkdir -p /opt/conf/task_6
+              #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
+              #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
+              git clone -b task_6 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_6
+              #kubectl wait --for=condition=Available deployment/coredns -n kube-system --timeout=180s
+              helm install jenkins /opt/conf/task_6/helm/jenkins/ -f /opt/conf/task_6/helm/jenkins/values.yaml --set jenkins.service.nodePort=32000
+              kubectl create secret generic jenkins-kubernetes-credentials   --from-file=kubeconfig=/etc/rancher/k3s/k3s.yaml -n jenkins
               EOF
 }
 

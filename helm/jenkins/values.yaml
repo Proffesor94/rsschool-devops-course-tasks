@@ -1,12 +1,12 @@
 namespace: jenkins
 
 jenkins:
-  image: "jenkins/jenkins:lts"
-  serviceAccountName: jenkins-admin
+  image: "jenkins/jenkins:lts-jdk17"
+  serviceAccountName: jenkins
   replicas: 1
   storage:
     accessMode: ReadWriteOnce
-    size: 8Gi
+    size: 10Gi
     pv:
       name: jenkins-pv
       storageClassName: local-storage

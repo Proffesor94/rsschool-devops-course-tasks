@@ -1,0 +1,4 @@
+apiVersion: v2
+name: word-cloud-generator
+description: Helm chart for deploying the word-cloud-generator application
+version: 0.1.0
