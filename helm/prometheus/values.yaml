@@ -1,0 +1,52 @@
+global:
+  scrape_interval: 15s # Default scraping interval
+  evaluation_interval: 15s # Rules evaluation interval
+
+# Prometheus configuration
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 32000 # Explicitly set NodePort to 32000
+    ports:
+      - name: http
+        port: 9090
+        targetPort: http
+        nodePort: 32000
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  retention: 7d # Retain metrics for 7 days
+  replicas: 1 # Single-node setup requires only 1 replica
+
+# Disable unnecessary components for resource optimization
+alertmanager:
+  enabled: false # Disable Alertmanager to save resources
+
+# Node Exporter configuration
+nodeExporter:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 25m
+      memory: 32Mi
+
+# Kube State Metrics configuration
+kubeStateMetrics:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# Prometheus Operator configuration
+prometheusOperator:
+  enabled: true
+  replicas: 1 # Single replica is sufficient
