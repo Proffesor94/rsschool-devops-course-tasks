@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
               # Create Nginx reverse proxy configuration
               cat << NGINXCONF > /etc/nginx/sites-available/reverse-proxy
               upstream backend {
-                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32000;
+                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32001;
                   keepalive 32;
               }
 
@@ -239,6 +239,7 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               chmod 700 get_helm.sh
               ./get_helm.sh
               mkdir -p /opt/conf/task_7
+              mkdir -p /opt/conf/task_8
               #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
               #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               #git clone -b task_6 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_6
@@ -249,6 +250,8 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               helm repo update
               git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
               helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_7/helm/prometheus/values.yaml
+              git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
+              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml
               EOF
 }
 
