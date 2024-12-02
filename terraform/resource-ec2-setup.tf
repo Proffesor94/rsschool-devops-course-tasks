@@ -259,7 +259,7 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml \
               --set --set service.type=NodePort \
               --set service.nodePort=32001 \
-              --set adminPassword=admin
+              --set adminPassword=${var.grafana_initial_password}
               EOF
 }
 
