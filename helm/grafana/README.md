@@ -1,7 +1,3 @@
-Given this setup, your reverse proxy is configured to forward HTTPS traffic to the Grafana service running on your K3s cluster. Below is a tailored **README.md** to document both the reverse proxy setup and Grafana dashboard creation:
-
----
-
 # **Grafana Setup with Reverse Proxy and Dashboard Creation**
 
 This document outlines the steps to set up Grafana with a reverse proxy and create a custom dashboard for Kubernetes metrics.
