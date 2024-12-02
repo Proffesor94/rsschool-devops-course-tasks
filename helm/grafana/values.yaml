@@ -32,10 +32,10 @@ grafana:
   sidecars:
     dashboards:
       enabled: true
-      label: grafana_dashboard=1
+      label: grafana_dashboard
     datasources:
       enabled: true
-      label: grafana_datasource=1
+      label: grafana_datasource
 
 # Persistence settings
 persistence:
@@ -54,7 +54,7 @@ datasources:
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus.monitoring.svc.cluster.local:9090
+        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
         access: proxy
         isDefault: true
         editable: true
