@@ -12,7 +12,7 @@ grafana:
     username: admin  # Default admin username
     password: admin  # Replace with a secure password
   service:
-    type: ClusterIP  # Reverse proxy handles public access
+    type: NodePort  # Reverse proxy handles public access
     port: 32001
     annotations: {}
   ingress:
@@ -30,21 +30,6 @@ grafana:
     enabled: true
   dashboardsConfigMaps:
     enabled: true
-  sidecars:
-    dashboards:
-      enabled: true
-      label: grafana_dashboard
-    datasources:
-      enabled: true
-      label: grafana_datasource
-
-# Persistence settings
-persistence:
-  enabled: true
-  storageClass: "gp2"  # Use default StorageClass or specify one
-  accessModes:
-    - ReadWriteOnce
-  size: 10Gi  # Adjust as needed for your dashboards and logs
 
 # Data source settings
 datasources:
@@ -61,13 +46,13 @@ datasources:
         isDefault: true
         editable: true
 
-# Dashboards
-# dashboards:
-#   enabled: true
-#   default:
-#     kubernetes-cluster:
-#       file: /tmp/dashboards/k8s-cluster.json
-#       # Replace with the actual path to your JSON dashboard
+ Dashboards
+ dashboards:
+   enabled: true
+   default:
+     Task 8:
+       file: /opt/conf/task_8/dashboards/k8s-cluster.json
+       
 
 # RBAC
 rbac:
@@ -96,15 +81,6 @@ readinessProbe:
   timeoutSeconds: 5
   successThreshold: 1
   failureThreshold: 6
-
-# Plugins
-# plugins:
-#   enabled: true
-#   install:
-#     - grafana-piechart-panel
-#     - grafana-clock-panel
-#     - alexanderzobnin-zabbix-app
-#     # Add any additional plugins
 
 # Custom labels and annotations
 podLabels: {}

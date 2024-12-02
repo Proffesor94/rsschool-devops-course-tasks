@@ -160,6 +160,11 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
   spot_type                      = "persistent" # Makes the request persistent
   instance_interruption_behavior = "stop"       # Options: stop or terminate
 
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp2"
+  }
+
   tags = {
     Name = "k3s-control-plane"
   }
@@ -251,7 +256,10 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               #git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
               git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
               helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/prometheus/values.yaml
-              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml
+              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml \
+              --set --set service.type=NodePort \
+              --set service.nodePort=32001 \
+              --set adminPassword=admin
               EOF
 }
 
