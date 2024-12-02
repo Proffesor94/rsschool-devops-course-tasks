@@ -8,16 +8,16 @@ global:
 # Grafana settings
 grafana:
   admin:
-    existingSecret: "" # Leave empty or provide a secret for admin credentials
-    username: admin # Default admin username
-    password: admin # Replace with a secure password
+    existingSecret: ""  # Leave empty or provide a secret for admin credentials
+    username: admin  # Default admin username
+    password: admin  # Replace with a secure password
   service:
-    type: ClusterIP # Reverse proxy handles public access
+    type: ClusterIP  # Reverse proxy handles public access
     port: 32001
     annotations: {}
   ingress:
-    enabled: false # Reverse proxy handles public exposure
-  replicaCount: 1 # Single-node setup
+    enabled: false  # Reverse proxy handles public exposure
+  replicaCount: 1  # Single-node setup
   podAnnotations: {}
   resources:
     limits:
@@ -41,21 +41,22 @@ grafana:
 # Persistence settings
 persistence:
   enabled: true
-  storageClass: "gp2" # Use default StorageClass or specify one
+  storageClass: "gp2"  # Use default StorageClass or specify one
   accessModes:
     - ReadWriteOnce
-  size: 10Gi # Adjust as needed for your dashboards and logs
+  size: 10Gi  # Adjust as needed for your dashboards and logs
 
 # Data source settings
 datasources:
   enabled: true
-  secretName: "" # Provide if using a secret to store data source credentials
+  secretName: ""  # Provide if using a secret to store data source credentials
   default:
     apiVersion: 1
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+        url: >
+          http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
         access: proxy
         isDefault: true
         editable: true
