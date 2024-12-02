@@ -212,7 +212,7 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
 
               # Configure swap parameters
               cat << 'SYSCTL' > /etc/sysctl.d/99-zram.conf
-              vm.swappiness = 10
+              vm.swappiness = 80
               vm.vfs_cache_pressure = 50
               vm.page-cluster = 0
               SYSCTL
