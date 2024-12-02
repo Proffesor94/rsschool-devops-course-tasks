@@ -1,3 +1,4 @@
+---
 # Global settings
 global:
   imageRegistry: ""
@@ -11,7 +12,7 @@ grafana:
     username: admin # Default admin username
     password: admin # Replace with a secure password
   service:
-    type: ClusterIP # Grafana will only be accessible within the cluster; reverse proxy handles public access
+    type: ClusterIP # Reverse proxy handles public access
     port: 32001
     annotations: {}
   ingress:
@@ -59,12 +60,13 @@ datasources:
         isDefault: true
         editable: true
 
-## Dashboards
-#dashboards:
-#  enabled: true
-#  default:
-#    kubernetes-cluster:
-#      file: /tmp/dashboards/k8s-cluster.json # Replace with the actual path to your JSON dashboard
+# Dashboards
+# dashboards:
+#   enabled: true
+#   default:
+#     kubernetes-cluster:
+#       file: /tmp/dashboards/k8s-cluster.json
+#       # Replace with the actual path to your JSON dashboard
 
 # RBAC
 rbac:
@@ -94,13 +96,14 @@ readinessProbe:
   successThreshold: 1
   failureThreshold: 6
 
-## Plugins
-#plugins:
-#  enabled: true
-#  install:
-#    - grafana-piechart-panel
-#    - grafana-clock-panel
-#    - alexanderzobnin-zabbix-app # Add any additional plugins
+# Plugins
+# plugins:
+#   enabled: true
+#   install:
+#     - grafana-piechart-panel
+#     - grafana-clock-panel
+#     - alexanderzobnin-zabbix-app
+#     # Add any additional plugins
 
 # Custom labels and annotations
 podLabels: {}
