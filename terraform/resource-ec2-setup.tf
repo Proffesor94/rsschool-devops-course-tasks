@@ -238,7 +238,7 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
               chmod 700 get_helm.sh
               ./get_helm.sh
-              mkdir -p /opt/conf/task_7
+              #mkdir -p /opt/conf/task_7
               mkdir -p /opt/conf/task_8
               #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
               #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
@@ -248,9 +248,9 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               #kubectl create secret generic jenkins-kubernetes-credentials   --from-file=kubeconfig=/etc/rancher/k3s/k3s.yaml -n jenkins
               helm repo add bitnami https://charts.bitnami.com/bitnami
               helm repo update
-              git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
-              helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_7/helm/prometheus/values.yaml
+              #git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
               git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
+              helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_7/helm/prometheus/values.yaml
               helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml
               EOF
 }

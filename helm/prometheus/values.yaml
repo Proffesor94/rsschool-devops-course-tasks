@@ -4,14 +4,14 @@ global:
 
 # Prometheus configuration
 prometheus:
-  service:
-    type: NodePort
-    nodePort: 32000 # Explicitly set NodePort to 32000
-    ports:
-      - name: http
-        port: 9090
-        targetPort: http
-        nodePort: 32000
+#  service:
+#    type: NodePort
+#    nodePort: 32000 # Explicitly set NodePort to 32000
+#    ports:
+#      - name: http
+#        port: 9090
+#        targetPort: http
+#        nodePort: 32000
   resources:
     limits:
       cpu: 200m
