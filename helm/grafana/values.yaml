@@ -51,7 +51,7 @@ datasources:
    enabled: true
    default:
      Task 8:
-       file: /opt/conf/task_8/dashboards/k8s-cluster.json
+       file: /opt/conf/task_8/dashboards/single_node.json
        
 
 # RBAC
