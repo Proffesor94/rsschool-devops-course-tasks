@@ -1,0 +1,89 @@
+---
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Grafana settings
+grafana:
+  admin:
+    existingSecret: ""  # Leave empty or provide a secret for admin credentials
+    username: admin  # Default admin username
+    password: admin  # Replace with a secure password
+  service:
+    type: NodePort  # Reverse proxy handles public access
+    port: 32001
+    annotations: {}
+  ingress:
+    enabled: false  # Reverse proxy handles public exposure
+  replicaCount: 1  # Single-node setup
+  podAnnotations: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  metrics:
+    enabled: true
+  dashboardsConfigMaps:
+    enabled: true
+
+# Data source settings
+datasources:
+  enabled: true
+  secretName: ""  # Provide if using a secret to store data source credentials
+  default:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: >
+          http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+        access: proxy
+        isDefault: true
+        editable: true
+
+ Dashboards
+ dashboards:
+   enabled: true
+   default:
+     Task 8:
+       file: /opt/conf/task_8/dashboards/single_node.json
+       
+
+# RBAC
+rbac:
+  create: true
+
+# Additional configurations
+securityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 1001
+  runAsGroup: 1001
+
+# Custom liveness and readiness probes
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 6
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 6
+
+# Custom labels and annotations
+podLabels: {}
+podAnnotations: {}
+serviceAccount:
+  create: true

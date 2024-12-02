@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
               # Create Nginx reverse proxy configuration
               cat << NGINXCONF > /etc/nginx/sites-available/reverse-proxy
               upstream backend {
-                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32000;
+                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32001;
                   keepalive 32;
               }
 
@@ -160,6 +160,11 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
   spot_type                      = "persistent" # Makes the request persistent
   instance_interruption_behavior = "stop"       # Options: stop or terminate
 
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp2"
+  }
+
   tags = {
     Name = "k3s-control-plane"
   }
@@ -207,7 +212,7 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
 
               # Configure swap parameters
               cat << 'SYSCTL' > /etc/sysctl.d/99-zram.conf
-              vm.swappiness = 10
+              vm.swappiness = 80
               vm.vfs_cache_pressure = 50
               vm.page-cluster = 0
               SYSCTL
@@ -238,7 +243,8 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
               chmod 700 get_helm.sh
               ./get_helm.sh
-              mkdir -p /opt/conf/task_7
+              #mkdir -p /opt/conf/task_7
+              mkdir -p /opt/conf/task_8
               #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
               #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               #git clone -b task_6 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_6
@@ -247,8 +253,13 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               #kubectl create secret generic jenkins-kubernetes-credentials   --from-file=kubeconfig=/etc/rancher/k3s/k3s.yaml -n jenkins
               helm repo add bitnami https://charts.bitnami.com/bitnami
               helm repo update
-              git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
-              helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_7/helm/prometheus/values.yaml
+              #git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
+              git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
+              helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/prometheus/values.yaml
+              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml \
+              --set --set service.type=NodePort \
+              --set service.nodePort=32001 \
+              --set adminPassword=${var.grafana_initial_password}
               EOF
 }
 

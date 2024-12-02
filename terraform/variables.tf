@@ -76,3 +76,10 @@ variable "k3s_token" {
   sensitive   = true
   default     = "12345" # Replace with your actual K3S token
 }
+
+variable "grafana_initial_password" {
+  description = "grafana initial password"
+  type        = string
+  sensitive   = true
+  default     = "admin"
+}
