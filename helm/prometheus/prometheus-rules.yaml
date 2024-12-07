@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: prometheus-rules
+  namespace: monitoring
+spec:
+  groups:
+    - name: k8s-rules
+      rules:
+        - alert: HighCpuUtilization
+          expr: |
+            sum(rate(node_cpu_seconds_total{mode!="idle"}[1m])) / sum(machine_cpu_cores) > 0.8
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU utilization detected on node {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} is using over 80% CPU for the last 1 minute."
+
+        - alert: CpuCoresCapacityExhausted
+          expr: |
+            sum(machine_cpu_cores) - sum(rate(node_cpu_seconds_total{mode!="idle"}[2m])) < 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CPU cores capacity almost exhausted on node {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} has less than 1 cores available for allocation."

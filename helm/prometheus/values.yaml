@@ -24,7 +24,7 @@ prometheus:
 
 # Disable unnecessary components for resource optimization
 alertmanager:
-  enabled: false # Disable Alertmanager to save resources
+  enabled: true # Disable Alertmanager to save resources
 
 # Node Exporter configuration
 nodeExporter:
