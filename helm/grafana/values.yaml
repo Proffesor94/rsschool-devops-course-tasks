@@ -46,12 +46,12 @@ datasources:
         isDefault: true
         editable: true
 
- Dashboards
+# Dashboards
  dashboards:
    enabled: true
    default:
      Task 8:
-       file: /opt/conf/task_8/dashboards/single_node.json
+       file: /opt/conf/task_9/dashboards/single_node.json
        
 
 # RBAC

@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
               # Create Nginx reverse proxy configuration
               cat << NGINXCONF > /etc/nginx/sites-available/reverse-proxy
               upstream backend {
-                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32001;
+                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32000;
                   keepalive 32;
               }
 
@@ -257,10 +257,11 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               #git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
               git clone -b task_9 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_9
               helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_9/helm/prometheus/values.yaml
-              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_9/helm/grafana/values.yaml \
-              --set --set service.type=NodePort \
-              --set service.nodePort=32001 \
-              --set adminPassword=${var.grafana_initial_password}
+              #helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_9/helm/grafana/values.yaml \
+              #--set service.type=NodePort \
+              #--set service.nodePort=32001 \
+              #--set adminPassword=${var.grafana_initial_password}
+              #kubectl patch svc grafana -n monitoring   -p '{"spec": {"type": "NodePort", "ports": [{"port": 3000, "targetPort": 3000, "nodePort": 32001}]}}'
               EOF
 }
 
