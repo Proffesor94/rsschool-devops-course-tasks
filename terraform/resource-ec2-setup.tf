@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
               # Create Nginx reverse proxy configuration
               cat << NGINXCONF > /etc/nginx/sites-available/reverse-proxy
               upstream backend {
-                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32001;
+                  server ${aws_spot_instance_request.k3s_control_plane.private_ip}:32000;
                   keepalive 32;
               }
 
@@ -244,22 +244,32 @@ resource "aws_spot_instance_request" "k3s_control_plane" {
               chmod 700 get_helm.sh
               ./get_helm.sh
               #mkdir -p /opt/conf/task_7
-              mkdir -p /opt/conf/task_8
+              #mkdir -p /opt/conf/task_8
+              mkdir -p /opt/conf/task_9
               #git clone -b task_5 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_5
               #helm install wordpress /opt/conf/task_5/helm/wordpress/ -f /opt/conf/task_5/helm/wordpress/values.yaml --set wordpress.service.nodePort=32000
               #git clone -b task_6 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_6
               #kubectl wait --for=condition=Available deployment/coredns -n kube-system --timeout=180s
               #helm install jenkins /opt/conf/task_6/helm/jenkins/ -f /opt/conf/task_6/helm/jenkins/values.yaml --set jenkins.service.nodePort=32000
               #kubectl create secret generic jenkins-kubernetes-credentials   --from-file=kubeconfig=/etc/rancher/k3s/k3s.yaml -n jenkins
-              helm repo add bitnami https://charts.bitnami.com/bitnami
+              #helm repo add bitnami https://charts.bitnami.com/bitnami
+              helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
               helm repo update
               #git clone -b task_7 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_7
-              git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
-              helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/prometheus/values.yaml
-              helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_8/helm/grafana/values.yaml \
-              --set --set service.type=NodePort \
-              --set service.nodePort=32001 \
-              --set adminPassword=${var.grafana_initial_password}
+              #git clone -b task_8 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_8
+              git clone -b task_9 https://github.com/Proffesor94/rsschool-devops-course-tasks.git /opt/conf/task_9
+              #helm upgrade --install prometheus bitnami/kube-prometheus --namespace monitoring --create-namespace -f /opt/conf/task_9/helm/prometheus/values.yaml
+              helm upgrade --install prometheus prometheus-community/prometheus -f /opt/conf/task_9/helm/prometheus/values.yaml
+              #kubectl wait --for=condition=Available deployment/prometheus-kube-prometheus-prometheus -n monitoring --timeout=180s
+              kubectl wait --for=condition=Available deployment/prometheus-server -n monitoring --timeout=180s
+              #kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring   -p '{"spec": {"type": "NodePort", "ports": [{"port": 9090, "targetPort": 9090, "nodePort": 32000}]}}'
+              kubectl patch svc prometheus-server   -p '{"spec": {"type": "NodePort", "ports": [{"port": 80, "targetPort": 9090, "nodePort": 32000}]}}'
+              #kubectl apply -f /opt/conf/task_9/helm/prometheus/prometheus-rules.yaml
+              #helm upgrade --install grafana bitnami/grafana --namespace monitoring --create-namespace -f /opt/conf/task_9/helm/grafana/values.yaml \
+              #--set service.type=NodePort \
+              #--set service.nodePort=32001 \
+              #--set adminPassword=${var.grafana_initial_password}
+              #kubectl patch svc grafana -n monitoring   -p '{"spec": {"type": "NodePort", "ports": [{"port": 3000, "targetPort": 3000, "nodePort": 32001}]}}'
               EOF
 }
 
