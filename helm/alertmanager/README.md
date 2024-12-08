@@ -35,7 +35,7 @@ This setup configures Prometheus to use Alertmanager for alert notifications. Al
 3. **Wait for Prometheus to be available:**
 
    ```bash
-   kubectl wait --for=condition=Available deployment/prometheus-server -n monitoring --timeout=180s
+   kubectl wait --for=condition=Available deployment/prometheus-server --timeout=180s
    ```
 
 4. **Expose Prometheus service:**
@@ -64,7 +64,7 @@ Alertmanager is configured to send alerts to both Gmail and Telegram.
            smarthost: smtp.gmail.com:587
            auth_username: serfer94@gmail.com
            auth_identity: serfer94@gmail.com
-           auth_password: "ilqrkdalboxulzjy" # Replace with your app password
+           auth_password: "password" # Replace with your app password
            send_resolved: true
            headers:
              subject: "Prometheus - Alert"
@@ -73,7 +73,7 @@ Alertmanager is configured to send alerts to both Gmail and Telegram.
      - name: 'telegram'
        telegram_configs:
          - api_url: "https://api.telegram.org"
-           bot_token: "7900728516:AAGAcHygy3hmM0ACkTEn4wgk3XlWPasdPtw" # Replace with your bot token
+           bot_token: "token" # Replace with your bot token
            chat_id: 428025159 # Replace with your chat ID
 
      - name: 'all-notifications'
@@ -83,14 +83,14 @@ Alertmanager is configured to send alerts to both Gmail and Telegram.
            smarthost: smtp.gmail.com:587
            auth_username: serfer94@gmail.com
            auth_identity: serfer94@gmail.com
-           auth_password: "ilqrkdalboxulzjy" # Replace with your app password
+           auth_password: "password" # Replace with your app password
            send_resolved: true
            headers:
              subject: "Prometheus - Alert"
              text: "{{ range .Alerts }} Hi, \n{{ .Annotations.summary }} \n {{ .Annotations.description }} {{end}} "
        telegram_configs:
          - api_url: "https://api.telegram.org"
-           bot_token: "7900728516:AAGAcHygy3hmM0ACkTEn4wgk3XlWPasdPtw" # Replace with your bot token
+           bot_token: "token" # Replace with your bot token
            chat_id: 428025159 # Replace with your chat ID
 
    route:
@@ -152,7 +152,7 @@ Create custom alert rules that will trigger based on CPU utilization and capacit
 2. **Check the logs** to verify that the alerts are being processed and sent to the specified receivers:
 
    ```bash
-   kubectl logs <alertmanager-pod-name> -n monitoring
+   kubectl logs <alertmanager-pod-name>
    ```
 
 ---
@@ -188,7 +188,7 @@ To test the alert configuration using a stress test on your Kubernetes cluster, 
 
    During the stress test, Prometheus should detect high CPU utilization (assuming you have the alert configured for CPU usage over 80%). You can verify the alert status in the Prometheus web UI:
 
-   - Open Prometheus at `http://<prometheus-ip>:9090`.
+   - Open Prometheus at `https://<bastion-ip>`.
    - Navigate to the **Alerts** tab to check for any active alerts.
    - You should see the alert for `HighCpuUtilization` being triggered during the stress test if the CPU usage exceeds 80%.
 
@@ -225,7 +225,6 @@ To test the alert configuration using a stress test on your Kubernetes cluster, 
     ```bash
     kubectl logs <alertmanager-pod-name> -n monitoring
     ```
-  - **Alertmanager UI**: Open the Alertmanager web UI to check the status of the alerts: `http://<alertmanager-service>:9093`
   - **Configuration Validation**: Ensure that the paths for email and Telegram bot configurations are correct.
 
 ---
