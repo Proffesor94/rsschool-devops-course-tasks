@@ -1,52 +1,71 @@
-global:
-  scrape_interval: 15s # Default scraping interval
-  evaluation_interval: 15s # Rules evaluation interval
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: k8s-rules
+        rules:
+          - alert: HighCpuUtilization
+            expr: |
+              sum(rate(node_cpu_seconds_total{mode!="idle"}[2m])) / sum(machine_cpu_cores) > 0.8
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High CPU utilization detected on node {{ $labels.instance }}"
+              description: "Node {{ $labels.instance }} is using over 80% CPU for the last 1 minute."
 
-# Prometheus configuration
-prometheus:
-#  service:
-#    type: NodePort
-#    nodePort: 32000 # Explicitly set NodePort to 32000
-#    ports:
-#      - name: http
-#        port: 9090
-#        targetPort: http
-#        nodePort: 32000
-  resources:
-    limits:
-      cpu: 200m
-      memory: 256Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  retention: 7d # Retain metrics for 7 days
-  replicas: 1 # Single-node setup requires only 1 replica
+          - alert: CpuCoresCapacityExhausted
+            expr: |
+              sum(machine_cpu_cores) - sum(rate(node_cpu_seconds_total{mode!="idle"}[2m])) < 1
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "CPU cores capacity almost exhausted on node {{ $labels.instance }}"
+              description: "Node {{ $labels.instance }} has less than 1 cores available for allocation."
+alertmanagerFiles:
+  alertmanager.yml: 
+    global:
+      resolve_timeout: 1m
 
-# Disable unnecessary components for resource optimization
-alertmanager:
-  enabled: false # Disable Alertmanager to save resources
+    receivers:
+    - name: 'gmail-notifications'
+      email_configs:
+      - to: serfer94@gmail.com  
+        from: serfer94@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: serfer94@gmail.com
+        auth_identity: serfer94@gmail.com
+        auth_password: "ilqrkdalboxulzjy" # Replace with your app password
+        send_resolved: true
+        headers:
+          subject: "Prometheus - Alert"
+          text: "{{ range .Alerts }} Hi, \n{{ .Annotations.summary }} \n {{ .Annotations.description }} {{end}} "
 
-# Node Exporter configuration
-nodeExporter:
-  resources:
-    limits:
-      cpu: 50m
-      memory: 64Mi
-    requests:
-      cpu: 25m
-      memory: 32Mi
+    - name: 'telegram'
+      telegram_configs:       
+      - api_url: "https://api.telegram.org"
+        bot_token: "7900728516:AAGAcHygy3hmM0ACkTEn4wgk3XlWPasdPtw" # Replace with your bot token
+        chat_id: 428025159       # Replace with your chat ID
 
-# Kube State Metrics configuration
-kubeStateMetrics:
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 50m
-      memory: 64Mi
+    - name: 'all-notifications'
+      email_configs:
+      - to: serfer94@gmail.com
+        from: serfer94@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: serfer94@gmail.com
+        auth_identity: serfer94@gmail.com
+        auth_password: "ilqrkdalboxulzjy" # Replace with your app password
+        send_resolved: true
+        headers:
+          subject: "Prometheus - Alert"
+          text: "{{ range .Alerts }} Hi, \n{{ .Annotations.summary }} \n {{ .Annotations.description }} {{end}} "
+      telegram_configs:
+      - api_url: "https://api.telegram.org"
+        bot_token: "7900728516:AAGAcHygy3hmM0ACkTEn4wgk3XlWPasdPtw" # Replace with your bot token
+        chat_id: 428025159       # Replace with your chat ID
 
-# Prometheus Operator configuration
-prometheusOperator:
-  enabled: true
-  replicas: 1 # Single replica is sufficient
+    route:
+      group_wait: 10s
+      group_interval: 2m
+      repeat_interval: 2m
+      receiver: 'all-notifications'
